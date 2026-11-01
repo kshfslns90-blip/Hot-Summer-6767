@@ -1,0 +1,2190 @@
+/* The application shell around the running forms: the classic sidebar and the office ribbon,
+   the user's corner, and the empty-state card. Colours come from the runtime's --gd-* tokens
+   so a form and its frame belong together; the accent can be set per project. */
+
+.gd-shell-root {
+  position: absolute;
+  inset: 0;
+  font-family: var(--gd-font);
+  color: var(--gd-fg);
+  background: var(--gd-surface);
+}
+
+.gd-shell {
+  display: flex;
+}
+
+.gd-shell .gd-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.gd-shell-noicon {
+  display: inline-block;
+}
+
+/* --- shared chrome ------------------------------------------------------- */
+
+.gd-shell-content {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  background: var(--gd-field);
+}
+
+.gd-shell-content > .gd-app-host {
+  position: absolute;
+  inset: 0;
+}
+
+.gd-shell-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gd-shell-userslot {
+  flex: 0 0 auto;
+}
+
+.gd-shell-user {
+  position: relative;
+}
+
+.gd-shell-userbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  padding: 4px 10px 4px 6px;
+  cursor: pointer;
+}
+
+.gd-shell-userbtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.gd-shell-usermenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 220px;
+  background: var(--gd-field);
+  color: var(--gd-fg);
+  border: 1px solid var(--gd-line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 22, 33, 0.18);
+  padding: 6px;
+  z-index: 50;
+}
+
+.gd-shell-userwho {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--gd-line);
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--gd-muted);
+}
+
+.gd-shell-userwho strong {
+  color: var(--gd-fg);
+  font-size: 13px;
+}
+
+.gd-shell-userwho em {
+  font-style: normal;
+  color: var(--gd-accent);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gd-shell-useritem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 7px 10px;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gd-shell-useritem:hover {
+  background: var(--gd-surface);
+}
+
+.gd-shell-navempty {
+  padding: 14px 16px;
+  font-size: 12px;
+  color: var(--gd-muted);
+}
+
+/* --- empty state --------------------------------------------------------- */
+
+.gd-shell-empty {
+  max-width: 440px;
+  margin: 12vh auto 0;
+  padding: 28px 30px;
+  background: var(--gd-field);
+  border: 1px solid var(--gd-line);
+  border-radius: 10px;
+  text-align: center;
+  color: var(--gd-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.gd-shell-empty h2 {
+  margin: 0 0 8px;
+  color: var(--gd-fg);
+  font-size: 20px;
+}
+
+/* --- none ---------------------------------------------------------------- */
+
+.gd-shell-none > .gd-app-host {
+  position: absolute;
+  inset: 0;
+}
+
+.gd-shell-userpill {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 10px;
+  border-radius: 999px;
+  background: rgba(31, 39, 51, 0.85);
+  color: #fff;
+  font-size: 12px;
+  z-index: 40;
+}
+
+.gd-shell-signout {
+  display: inline-flex;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 3px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.gd-shell-signout:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* --- classic --------------------------------------------------------------- */
+
+.gd-shell-classic {
+  flex-direction: row;
+}
+
+.gd-shell-side {
+  flex: 0 0 236px;
+  display: flex;
+  flex-direction: column;
+  background: var(--gd-surface);
+  color: var(--gd-fg);
+  border-right: 1px solid var(--gd-line);
+  transition: flex-basis 0.15s ease;
+  overflow: hidden;
+}
+
+.gd-shell-side-collapsed .gd-shell-side {
+  flex-basis: 56px;
+}
+
+.gd-shell-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--gd-line);
+}
+
+.gd-shell-brandname {
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gd-shell-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.gd-shell-toggle:hover {
+  background: rgba(15, 22, 33, 0.07);
+}
+
+.gd-shell-nav {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 8px 0 16px;
+}
+
+.gd-shell-group {
+  padding: 6px 0;
+}
+
+.gd-shell-grouphead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gd-muted);
+  white-space: nowrap;
+}
+
+.gd-shell-grouphead .gd-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.gd-shell-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 16px);
+  margin: 1px 8px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gd-shell-item:hover:not(:disabled) {
+  background: rgba(15, 22, 33, 0.06);
+}
+
+.gd-shell-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-item-active,
+.gd-shell-item-active:hover:not(:disabled) {
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-shell-itemlabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gd-shell-side-collapsed .gd-shell-brandname,
+.gd-shell-side-collapsed .gd-shell-grouphead span,
+.gd-shell-side-collapsed .gd-shell-itemlabel {
+  display: none;
+}
+
+.gd-shell-side-collapsed .gd-shell-grouphead {
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+
+.gd-shell-side-collapsed .gd-shell-item {
+  justify-content: center;
+  padding: 9px 0;
+}
+
+.gd-shell-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gd-shell-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 18px;
+  background: var(--gd-field);
+  border-bottom: 1px solid var(--gd-line);
+}
+
+/* --- office ---------------------------------------------------------------- */
+
+.gd-shell-office {
+  flex-direction: column;
+}
+
+.gd-shell-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-shell-titlebar .gd-shell-brandname {
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.gd-shell-titlebar .gd-shell-title {
+  font-weight: 400;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.gd-shell-titlebar .gd-shell-userbtn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.gd-shell-ribbon {
+  background: var(--gd-field);
+  border-bottom: 1px solid var(--gd-line);
+  box-shadow: 0 2px 6px rgba(15, 22, 33, 0.06);
+  position: relative;
+  z-index: 1;
+}
+
+.gd-shell-ribbon-strip {
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 10px 0;
+  background: color-mix(in srgb, var(--gd-accent) 8%, var(--gd-surface));
+  border-bottom: 1px solid var(--gd-line);
+}
+
+.gd-shell-ribbon-tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gd-shell-ribbon-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--gd-muted);
+  padding: 7px 14px;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gd-shell-ribbon-tab .gd-icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* A group without an icon starts at its name, no gap. */
+.gd-shell-ribbon-tab .gd-shell-noicon {
+  display: none;
+}
+
+.gd-shell-ribbon-tab:hover {
+  color: var(--gd-fg);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.gd-shell-ribbon-tab:focus-visible {
+  outline: 2px solid var(--gd-accent);
+  outline-offset: -2px;
+}
+
+.gd-shell-ribbon-tab-active,
+.gd-shell-ribbon-tab-active:hover {
+  background: var(--gd-field);
+  border-color: var(--gd-line);
+  color: var(--gd-accent);
+  font-weight: 600;
+}
+
+/* The folded ribbon keeps its tabs as a flat strip, no tab standing proud of it. */
+.gd-shell-ribbon-collapsed .gd-shell-ribbon-tab-active,
+.gd-shell-ribbon-collapsed .gd-shell-ribbon-tab-active:hover {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: inset 0 -2px 0 var(--gd-accent);
+}
+
+.gd-shell-ribbon-fold {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin: 0 0 4px 8px;
+  padding: 3px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gd-muted);
+  cursor: pointer;
+}
+
+.gd-shell-ribbon-fold:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--gd-fg);
+}
+
+.gd-shell-ribbon-fold .gd-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.gd-shell-ribbon-body {
+  min-height: 96px;
+  padding: 8px 12px;
+}
+
+.gd-shell-ribbon-body[hidden] {
+  display: none;
+}
+
+.gd-shell-ribbon-panel {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2px;
+  overflow-x: auto;
+}
+
+/* Only the chosen tab's buttons show; display:flex above would otherwise beat hidden. */
+.gd-shell-ribbon-panel[hidden] {
+  display: none;
+}
+
+.gd-shell-ribbon-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 84px;
+  height: 80px;
+  padding: 10px 6px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gd-fg);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.15;
+  cursor: pointer;
+}
+
+.gd-shell-ribbon-btn .gd-icon {
+  width: 30px;
+  height: 30px;
+  color: var(--gd-accent);
+  transition: transform 0.12s ease;
+}
+
+.gd-shell-ribbon-label {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: center;
+  max-width: 100%;
+}
+
+.gd-shell-ribbon-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gd-accent) 8%, var(--gd-field));
+  border-color: color-mix(in srgb, var(--gd-accent) 35%, var(--gd-line));
+}
+
+.gd-shell-ribbon-btn:hover:not(:disabled) .gd-icon {
+  transform: translateY(-1px);
+}
+
+.gd-shell-ribbon-btn:active:not(:disabled) {
+  background: color-mix(in srgb, var(--gd-accent) 16%, var(--gd-field));
+}
+
+.gd-shell-ribbon-btn:focus-visible {
+  outline: 2px solid var(--gd-accent);
+  outline-offset: -2px;
+}
+
+.gd-shell-ribbon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-ribbon-btn-active,
+.gd-shell-ribbon-btn-active:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gd-accent) 14%, var(--gd-field));
+  border-color: var(--gd-accent);
+}
+
+.gd-shell-ribbon-empty {
+  align-self: center;
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--gd-muted);
+  font-style: italic;
+}
+
+/* --- the pages of authentication ------------------------------------------ */
+
+.gd-auth {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  font-family: var(--gd-font);
+  color: var(--gd-fg);
+  background: var(--gd-surface);
+}
+
+.gd-auth-hero {
+  display: none;
+}
+
+.gd-auth-panel {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
+}
+
+.gd-auth-card {
+  width: 360px;
+  max-width: 100%;
+  background: var(--gd-field);
+  border: 1px solid var(--gd-line);
+  border-radius: 12px;
+  padding: 28px 30px 24px;
+  box-shadow: 0 18px 50px rgba(15, 22, 33, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gd-auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gd-accent);
+}
+
+.gd-auth-brand .gd-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.gd-auth-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gd-auth-intro {
+  margin: -6px 0 0;
+  font-size: 13px;
+  color: var(--gd-muted);
+  line-height: 1.45;
+}
+
+.gd-auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gd-muted);
+}
+
+.gd-auth-field input {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--gd-fg);
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  padding: 9px 11px;
+  background: var(--gd-field);
+}
+
+.gd-auth-field input:focus {
+  outline: none;
+  border-color: var(--gd-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gd-accent) 22%, transparent);
+}
+
+.gd-auth-error {
+  font-size: 13px;
+  color: var(--gd-danger);
+  background: color-mix(in srgb, var(--gd-danger) 9%, var(--gd-field));
+  border-radius: var(--gd-radius);
+  padding: 8px 10px;
+}
+
+.gd-auth-notice {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gd-fg);
+}
+
+.gd-auth-button {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gd-accent-fg);
+  background: var(--gd-accent);
+  border: none;
+  border-radius: var(--gd-radius);
+  padding: 10px 14px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.gd-auth-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.gd-auth-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.gd-auth-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.gd-auth-links a {
+  color: var(--gd-accent);
+  text-decoration: none;
+}
+
+.gd-auth-links a:hover {
+  text-decoration: underline;
+}
+
+/* split: words left, the card right */
+.gd-auth-split .gd-auth-hero {
+  display: flex;
+  flex: 1 1 52%;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vh 8vw;
+  background: linear-gradient(135deg, var(--gd-accent), color-mix(in srgb, var(--gd-accent) 55%, #0b1f3a));
+  color: #fff;
+}
+
+.gd-auth-split .gd-auth-herotitle {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.gd-auth-split .gd-auth-tagline {
+  margin-top: 18px;
+  font-size: clamp(15px, 1.6vw, 20px);
+  line-height: 1.5;
+  opacity: 0.9;
+  max-width: 34ch;
+}
+
+.gd-auth-split .gd-auth-panel {
+  flex: 1 1 48%;
+  background: var(--gd-field);
+}
+
+.gd-auth-split .gd-auth-card {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  width: 380px;
+}
+
+/* cover: the card over the accent */
+.gd-auth-cover {
+  background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--gd-accent) 70%, #fff), var(--gd-accent) 55%, color-mix(in srgb, var(--gd-accent) 60%, #0b1f3a));
+}
+
+.gd-auth-cover .gd-auth-hero {
+  display: flex;
+  position: absolute;
+  left: 32px;
+  top: 28px;
+  flex-direction: column;
+  color: #fff;
+}
+
+.gd-auth-cover .gd-auth-herotitle {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gd-auth-cover .gd-auth-tagline {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.gd-auth-cover .gd-auth-card {
+  border: none;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 760px) {
+  .gd-auth-split .gd-auth-hero {
+    display: none;
+  }
+}
+
+/* --- the Users page --------------------------------------------------------- */
+
+.gd-users {
+  padding: 22px 26px 32px;
+  max-width: 1100px;
+  font-size: 13px;
+}
+
+.gd-users-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.gd-users-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gd-users-head h2 {
+  margin: 0 0 2px;
+  font-size: 20px;
+}
+
+.gd-users-note {
+  color: var(--gd-muted);
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.gd-users-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gd-users-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--gd-line);
+  border-radius: 999px;
+  background: var(--gd-field);
+  padding: 0 10px;
+  height: 32px;
+  color: var(--gd-muted);
+}
+
+.gd-users-search:focus-within {
+  border-color: var(--gd-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gd-accent) 18%, transparent);
+}
+
+.gd-users-search .gd-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.gd-users-search input {
+  font: inherit;
+  font-size: 13px;
+  border: none;
+  background: transparent;
+  color: var(--gd-fg);
+  width: 190px;
+  outline: none;
+}
+
+.gd-users-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  color: var(--gd-fg);
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.gd-users-btn .gd-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.gd-users-btn:hover {
+  border-color: var(--gd-accent);
+}
+
+.gd-users-btn-primary {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-users-btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.gd-users-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--gd-field);
+  border: 1px solid var(--gd-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.gd-users-table th,
+.gd-users-table td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--gd-line);
+  vertical-align: middle;
+}
+
+.gd-users-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gd-muted);
+  background: var(--gd-surface);
+}
+
+.gd-users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gd-users-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--gd-accent) 4%, var(--gd-field));
+}
+
+.gd-users-row-me td {
+  background: color-mix(in srgb, var(--gd-accent) 6%, var(--gd-field));
+}
+
+.gd-users-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 240px;
+}
+
+.gd-users-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: hsl(var(--gd-avatar-hue, 210) 45% 30%);
+  background: hsl(var(--gd-avatar-hue, 210) 70% 90%);
+}
+
+.gd-users-names {
+  min-width: 0;
+}
+
+.gd-users-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gd-users-you {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-users-email {
+  color: var(--gd-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gd-users-role {
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid transparent;
+  border-radius: var(--gd-radius);
+  padding: 4px 6px;
+  background: transparent;
+  color: var(--gd-fg);
+  cursor: pointer;
+}
+
+.gd-users-role:hover,
+.gd-users-role:focus {
+  border-color: var(--gd-line);
+  background: var(--gd-field);
+}
+
+.gd-users-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--gd-surface);
+  color: var(--gd-muted);
+}
+
+.gd-users-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.gd-users-status-active {
+  background: #e3f5e8;
+  color: #1f7a3c;
+}
+
+.gd-users-status-inactive {
+  background: #fbe9e7;
+  color: #b3261e;
+}
+
+.gd-users-status-invited {
+  background: #fff4d6;
+  color: #8a5a00;
+}
+
+.gd-users-when {
+  color: var(--gd-muted);
+  white-space: nowrap;
+}
+
+.gd-users-rowactions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.gd-users-iconbtn {
+  display: inline-flex;
+  border: 1px solid transparent;
+  border-radius: var(--gd-radius);
+  background: transparent;
+  color: var(--gd-muted);
+  padding: 5px;
+  margin-left: 2px;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.12s;
+}
+
+.gd-users-table tbody tr:hover .gd-users-iconbtn,
+.gd-users-iconbtn:focus-visible {
+  opacity: 1;
+}
+
+.gd-users-iconbtn .gd-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.gd-users-iconbtn:hover {
+  color: var(--gd-accent);
+  border-color: var(--gd-line);
+  background: var(--gd-surface);
+}
+
+.gd-users-iconbtn-danger:hover {
+  color: var(--gd-danger);
+}
+
+.gd-users-linkrow td {
+  background: #fffbea;
+  padding-top: 6px;
+  padding-bottom: 8px;
+}
+
+.gd-users-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #8a5a00;
+}
+
+.gd-users-link .gd-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.gd-users-link input {
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: 12px;
+  font-family: Consolas, monospace;
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  padding: 4px 6px;
+  background: var(--gd-field);
+  color: var(--gd-fg);
+}
+
+.gd-users-link .gd-users-iconbtn {
+  opacity: 1;
+}
+
+.gd-users-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--gd-muted);
+  background: var(--gd-field);
+  border: 1px dashed var(--gd-line);
+  border-radius: 10px;
+}
+
+/* --- the API keys page: what the Users page has, plus the box a new key shows in once --- */
+
+.gd-apikeys-intro {
+  margin: 0 0 14px;
+  color: var(--gd-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.gd-apikeys-prefix {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  color: var(--gd-muted);
+}
+
+.gd-apikeys-name {
+  font-weight: 600;
+}
+
+.gd-apikeys-fresh {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--gd-accent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--gd-accent) 7%, var(--gd-field));
+}
+
+.gd-apikeys-freshtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.gd-apikeys-freshtitle .gd-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--gd-accent);
+}
+
+.gd-apikeys-keybox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.gd-apikeys-keybox input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  padding: 6px 8px;
+  background: var(--gd-field);
+  color: var(--gd-fg);
+}
+
+.gd-apikeys-freshfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gd-apikeys-freshnote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #8a5a00;
+}
+
+.gd-apikeys-freshnote .gd-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- the Secrets page: the Users page's table, a status pill, and the key's note --- */
+
+.gd-secrets-name {
+  font-family: Consolas, monospace;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gd-secrets-desc {
+  color: var(--gd-muted);
+  line-height: 1.4;
+}
+
+.gd-secrets-nodesc {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.gd-secrets-row-not-configured td:first-child {
+  box-shadow: inset 3px 0 0 #e0a800;
+}
+
+.gd-secrets-row-unavailable td:first-child {
+  box-shadow: inset 3px 0 0 var(--gd-danger);
+}
+
+.gd-secrets-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.gd-secrets-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.gd-secrets-pill-ok {
+  background: #e3f5e8;
+  color: #1f7a3c;
+}
+
+.gd-secrets-pill-missing {
+  background: #fff4d6;
+  color: #8a5a00;
+}
+
+.gd-secrets-pill-bad {
+  background: #fbe9e7;
+  color: #b3261e;
+}
+
+.gd-secrets-set {
+  height: 28px;
+  font-size: 12px;
+}
+
+.gd-secrets-set:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gd-secrets-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--gd-danger) 45%, var(--gd-line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--gd-danger) 7%, var(--gd-field));
+}
+
+.gd-secrets-banner[hidden] {
+  display: none;
+}
+
+.gd-secrets-bannertext {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.gd-secrets-bannertext .gd-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--gd-danger);
+}
+
+.gd-secrets-reset {
+  flex: 0 0 auto;
+  color: var(--gd-danger);
+  border-color: color-mix(in srgb, var(--gd-danger) 45%, var(--gd-line));
+}
+
+.gd-secrets-reset:hover {
+  border-color: var(--gd-danger);
+}
+
+/* A secret's value field in the form dialog: an eye, and a Multi-line switch for keys. */
+.gd-secret-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.gd-secret-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.gd-secret-row .gd-users-fieldinput {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gd-secret-area {
+  resize: vertical;
+  min-height: 90px;
+  font-family: Consolas, monospace;
+  font-size: 12px;
+}
+
+.gd-secret-masked {
+  -webkit-text-security: disc;
+}
+
+.gd-secret-eye {
+  opacity: 1;
+}
+
+.gd-secret-multi {
+  font-size: 12px;
+  color: var(--gd-muted);
+}
+
+/* --- the Users page's form dialog ------------------------------------------- */
+
+.gd-users-form {
+  width: 420px;
+}
+
+.gd-users-formintro {
+  color: var(--gd-muted);
+  font-size: 13px;
+}
+
+.gd-users-fields {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 10px 12px;
+  align-items: center;
+}
+
+.gd-users-fieldlabel {
+  font-size: 13px;
+  color: var(--gd-muted);
+}
+
+.gd-users-fieldinput {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 13px;
+}
+
+select.gd-users-fieldinput {
+  height: 28px;
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  color: var(--gd-fg);
+  padding: 0 6px;
+}
+
+.gd-users-fieldcheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.gd-users-formerror {
+  font-size: 12px;
+  color: var(--gd-danger);
+}
+
+/* --- the Users page across widths --------------------------------------------- */
+
+.gd-users {
+  max-width: none;
+}
+
+.gd-users-head {
+  flex-wrap: wrap;
+}
+
+.gd-users-actions {
+  flex-wrap: wrap;
+}
+
+.gd-users-search {
+  flex: 1 1 160px;
+  max-width: 320px;
+}
+
+.gd-users-search input {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Medium: the sign-in column goes, the rest breathes. */
+@media (max-width: 900px) {
+  .gd-users {
+    padding: 16px 16px 28px;
+  }
+
+  .gd-users-table th:nth-child(4),
+  .gd-users-table td.gd-users-when {
+    display: none;
+  }
+
+  .gd-users-who {
+    min-width: 0;
+  }
+}
+
+/* Narrow: every row becomes a card - who, then role and status, then the actions. */
+@media (max-width: 640px) {
+  .gd-users-table thead {
+    display: none;
+  }
+
+  .gd-users-table,
+  .gd-users-table tbody {
+    display: block;
+  }
+
+  .gd-users-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'who status'
+      'role role'
+      'actions actions';
+    gap: 8px 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gd-line);
+  }
+
+  .gd-users-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .gd-users-table tbody tr:hover td,
+  .gd-users-row-me td {
+    background: transparent;
+  }
+
+  .gd-users-row-me {
+    background: color-mix(in srgb, var(--gd-accent) 6%, var(--gd-field));
+  }
+
+  .gd-users-table td {
+    display: block;
+    padding: 0;
+    border: none;
+  }
+
+  .gd-users-who {
+    grid-area: who;
+  }
+
+  .gd-users-statuscell {
+    grid-area: status;
+  }
+
+  .gd-users-rolecell {
+    grid-area: role;
+  }
+
+  .gd-users-rolecell .gd-users-role {
+    border-color: var(--gd-line);
+    background: var(--gd-field);
+  }
+
+  .gd-users-rowactions {
+    grid-area: actions;
+    text-align: left;
+    display: flex;
+    gap: 4px;
+  }
+
+  .gd-users-iconbtn {
+    opacity: 1;
+    margin-left: 0;
+    border-color: var(--gd-line);
+  }
+
+  .gd-users-table tbody tr.gd-users-linkrow {
+    display: block;
+    padding: 8px 14px;
+  }
+
+  .gd-users-link {
+    flex-wrap: wrap;
+  }
+
+  .gd-users-form {
+    width: 92vw;
+  }
+
+  .gd-users-fields {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .gd-users-fieldlabel {
+    margin-top: 6px;
+  }
+}
+
+/* Narrow, continued: the flex cells keep their layout despite the block rule above, nothing
+   wider than the viewport, and the classic sidebar folds to icons to make room. */
+@media (max-width: 640px) {
+  .gd-users-table td.gd-users-who {
+    display: flex;
+  }
+
+  .gd-users-table td.gd-users-rowactions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .gd-users-link input {
+    flex: 1 1 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .gd-users-names {
+    overflow: hidden;
+  }
+
+  .gd-shell-body .gd-toasts {
+    left: 12px;
+    right: 12px;
+    max-width: none;
+  }
+
+  .gd-shell-body .gd-toasts > * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 720px) {
+  .gd-shell-classic .gd-shell-side {
+    flex-basis: 56px;
+  }
+
+  .gd-shell-classic .gd-shell-brandname,
+  .gd-shell-classic .gd-shell-grouphead span,
+  .gd-shell-classic .gd-shell-itemlabel {
+    display: none;
+  }
+
+  .gd-shell-classic .gd-shell-grouphead {
+    justify-content: center;
+    padding: 8px 0 4px;
+  }
+
+  .gd-shell-classic .gd-shell-item {
+    justify-content: center;
+    padding: 9px 0;
+  }
+
+  .gd-shell-classic .gd-shell-toggle {
+    display: none;
+  }
+
+  .gd-shell-top {
+    padding: 0 12px;
+  }
+
+  .gd-users {
+    padding: 12px 10px 24px;
+  }
+}
+
+/* --- the menu without its groups ---------------------------------------------- */
+
+.gd-shell-group-flat {
+  padding: 0;
+}
+
+.gd-shell-ribbon-tabs[hidden] {
+  display: none;
+}
+
+.gd-shell-ribbon-strip[hidden] {
+  display: none;
+}
+
+/* --- navbar ------------------------------------------------------------------- */
+
+.gd-shell-navbar {
+  flex-direction: column;
+}
+
+.gd-shell-navbar-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--gd-field);
+  border-bottom: 1px solid var(--gd-line);
+  box-shadow: 0 2px 6px rgba(15, 22, 33, 0.05);
+  position: relative;
+  z-index: 2;
+}
+
+.gd-shell-navbar-bar .gd-shell-brandname {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex: 0 0 auto;
+}
+
+.gd-shell-navlinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gd-shell-navdrop {
+  position: relative;
+}
+
+.gd-shell-navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gd-muted);
+  padding: 8px 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gd-shell-navlink .gd-icon {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.12s ease;
+}
+
+.gd-shell-navlink:hover:not(:disabled) {
+  color: var(--gd-fg);
+  background: var(--gd-surface);
+}
+
+.gd-shell-navlink:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-navlink-active,
+.gd-shell-navlink-active:hover:not(:disabled) {
+  color: var(--gd-accent);
+  font-weight: 600;
+}
+
+.gd-shell-navlink-open .gd-icon {
+  transform: rotate(180deg);
+}
+
+.gd-shell-navmenu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  min-width: 200px;
+  background: var(--gd-field);
+  border: 1px solid var(--gd-line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 22, 33, 0.16);
+  padding: 6px;
+  z-index: 40;
+}
+
+.gd-shell-navmenu[hidden] {
+  display: none;
+}
+
+.gd-shell-navitem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gd-fg);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gd-shell-navitem:hover:not(:disabled) {
+  background: var(--gd-surface);
+}
+
+.gd-shell-navitem:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-navitem-active,
+.gd-shell-navitem-active:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gd-accent) 12%, var(--gd-field));
+  color: var(--gd-accent);
+}
+
+.gd-shell-navempty {
+  font-size: 12px;
+  color: var(--gd-muted);
+  padding: 8px 10px;
+}
+
+@media (max-width: 720px) {
+  .gd-shell-navbar-bar {
+    gap: 10px;
+    padding: 0 12px;
+  }
+
+  .gd-shell-navlinks {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .gd-shell-navlink {
+    padding: 8px 8px;
+    font-size: 13px;
+  }
+}
+
+/* --- actionbar ---------------------------------------------------------------- */
+
+.gd-shell-actionbar {
+  flex-direction: row;
+}
+
+.gd-shell-abar {
+  flex: 0 0 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #1f2733;
+  color: #dfe5ee;
+}
+
+.gd-shell-abar-brand {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gd-shell-abar-rail {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 0;
+}
+
+.gd-shell-abar-rail .gd-shell-navempty {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.gd-shell-abtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: calc(100% - 12px);
+  margin: 2px 6px;
+  height: 60px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.gd-shell-abtn .gd-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.gd-shell-abtn .gd-shell-noicon {
+  width: 22px;
+  height: 22px;
+}
+
+.gd-shell-abtn-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gd-shell-abtn:hover:not(:disabled),
+.gd-shell-abtn-open {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.gd-shell-abtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-abtn-active,
+.gd-shell-abtn-active:hover:not(:disabled) {
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-shell-abar-user {
+  padding: 8px 6px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: center;
+}
+
+.gd-shell-abar-user .gd-shell-userbtn {
+  color: inherit;
+}
+
+.gd-shell-abar-user .gd-shell-username {
+  display: none;
+}
+
+.gd-shell-abar-user .gd-shell-usermenu {
+  right: auto;
+  left: 0;
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.gd-shell-apalette {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--gd-accent) 16%, var(--gd-field));
+  border-right: 1px solid var(--gd-line);
+  min-height: 0;
+}
+
+.gd-shell-apalette[hidden] {
+  display: none;
+}
+
+.gd-shell-apalette-title {
+  padding: 18px 16px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gd-fg);
+}
+
+.gd-shell-apalette-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 8px 12px;
+}
+
+.gd-shell-aitem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gd-fg);
+  padding: 8px 10px;
+  margin: 1px 0;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gd-shell-aitem:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.gd-shell-aitem:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-aitem-active,
+.gd-shell-aitem-active:hover:not(:disabled) {
+  background: #1f2733;
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .gd-shell-apalette {
+    flex-basis: 170px;
+  }
+}
+
+/* --- bottom ------------------------------------------------------------------- */
+
+.gd-shell-bottom {
+  flex-direction: column;
+}
+
+.gd-shell-bottom-top {
+  height: 44px;
+  gap: 10px;
+}
+
+.gd-shell-bottom-top .gd-shell-brandname {
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.gd-shell-bottom-top .gd-shell-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gd-muted);
+}
+
+.gd-shell-bottom-top .gd-shell-username {
+  display: none;
+}
+
+.gd-shell-bbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 2px;
+  padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px));
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 4;
+}
+
+.gd-shell-bbar .gd-shell-navempty {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.gd-shell-btab {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 64px;
+  padding: 6px 4px 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.gd-shell-btab .gd-icon,
+.gd-shell-btab .gd-shell-noicon {
+  width: 24px;
+  height: 24px;
+}
+
+.gd-shell-btab-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gd-shell-btab:hover:not(:disabled),
+.gd-shell-btab-open {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.gd-shell-btab:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gd-shell-btab-active {
+  opacity: 1;
+  color: #7ff5e0;
+}
+
+.gd-shell-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 62px;
+  background: var(--gd-field);
+  color: var(--gd-fg);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -10px 30px rgba(15, 22, 33, 0.2);
+  padding: 12px 12px 16px;
+  z-index: 3;
+  max-height: 60%;
+  overflow: auto;
+}
+
+.gd-shell-sheet[hidden] {
+  display: none;
+}
+
+.gd-shell-sheet-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gd-muted);
+  padding: 4px 8px 8px;
+}
+
+.gd-shell-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  font: inherit;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--gd-fg);
+  padding: 12px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gd-shell-sheet-item:hover:not(:disabled) {
+  background: var(--gd-surface);
+}
+
+.gd-shell-sheet-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gd-shell-sheet-item-active,
+.gd-shell-sheet-item-active:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gd-accent) 14%, var(--gd-field));
+  color: var(--gd-accent);
+}
+
+/* --- the brand: the logo, or the name --------------------------------------- */
+
+.gd-shell-brand-btn {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.gd-shell-brand-btn > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gd-shell-brand-btn:hover > span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gd-shell-logo {
+  display: block;
+  height: 28px;
+  max-width: 180px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.gd-shell-brand-btn:hover .gd-shell-logo {
+  opacity: 0.85;
+}
+
+.gd-shell-titlebar .gd-shell-logo,
+.gd-shell-bottom-top .gd-shell-logo {
+  height: 26px;
+}
+
+.gd-shell-abar-brand .gd-shell-brand-btn {
+  justify-content: center;
+  width: 100%;
+}
+
+.gd-shell-abar-brandname {
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.gd-shell-abar-brand .gd-shell-logo {
+  height: 36px;
+  max-width: 60px;
+  object-position: center;
+}
+
+.gd-shell-side-collapsed .gd-shell-brand-btn {
+  display: none;
+}
+
+.gd-auth-brand-logo {
+  justify-content: center;
+}
+
+.gd-auth-brand .gd-shell-logo {
+  height: 40px;
+  max-width: 220px;
+  object-position: center;
+}

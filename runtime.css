@@ -1,0 +1,1873 @@
+/* Widget presentation. Shared by the running application and the designer canvas so that the
+   design surface is a true preview. */
+:root {
+  --gd-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --gd-fg: #1f2733;
+  --gd-muted: #5b6675;
+  --gd-line: #c3ccd8;
+  --gd-field: #ffffff;
+  --gd-surface: #eef1f6;
+  --gd-accent: #2f6fd0;
+  --gd-accent-fg: #ffffff;
+  --gd-danger: #c0392b;
+  --gd-radius: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body.gd-run {
+  margin: 0;
+  font-family: var(--gd-font);
+  font-size: 13px;
+  color: var(--gd-fg);
+  background: var(--gd-surface);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.gd-app-host {
+  position: absolute;
+  inset: 0;
+  overflow: auto; /* a form that keeps its designed size (scroll: auto) scrolls here */
+}
+
+.gd-node {
+  position: absolute;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.gd-form {
+  position: absolute;
+  inset: 0;
+  background: var(--gd-surface);
+  overflow: hidden;
+}
+
+/* A form hidden behind the one it opened (form.open()): kept whole, shown again on form.back(). */
+.gd-form.gd-form-suspended {
+  display: none;
+}
+
+.gd-disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.gd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--gd-radius);
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+  cursor: pointer;
+  padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.gd-button-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gd-button[data-icon-position='right'] {
+  flex-direction: row-reverse;
+}
+
+.gd-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.gd-button-icon .gd-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.gd-button-icon-only {
+  padding: 0 6px;
+}
+
+.gd-button-icon-only .gd-button-text {
+  display: none;
+}
+
+.gd-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.gd-button:disabled {
+  cursor: default;
+}
+
+.gd-button[data-variant='default'] {
+  background: #fdfdfe;
+  color: var(--gd-fg);
+  border-color: var(--gd-line);
+}
+
+.gd-button[data-variant='danger'] {
+  background: var(--gd-danger);
+}
+
+/* The Upload control: the Button's look with a hidden file input, or a drop zone. */
+.gd-upload {
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.gd-upload-input {
+  display: none;
+}
+
+.gd-upload.gd-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.gd-upload-busy {
+  cursor: progress;
+}
+
+.gd-upload-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px dashed var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-surface);
+  color: var(--gd-muted);
+  text-align: center;
+  overflow: hidden;
+}
+
+.gd-upload-drop .gd-button-icon {
+  font-size: 22px;
+}
+
+.gd-upload-drop .gd-button-icon .gd-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.gd-upload-drop .gd-button-text {
+  white-space: normal;
+}
+
+.gd-upload-drop[data-over] {
+  border-color: var(--gd-accent);
+  background: #e6eefb;
+  color: var(--gd-accent);
+}
+
+.gd-label {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gd-label-multiline {
+  align-items: flex-start;
+  white-space: pre-wrap;
+}
+
+.gd-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--gd-accent);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gd-link:hover:not(.gd-disabled) {
+  text-decoration: underline;
+}
+
+.gd-link.gd-disabled {
+  cursor: default;
+}
+
+.gd-input,
+.gd-textarea,
+.gd-combobox {
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  color: inherit;
+  font: inherit;
+  padding: 2px 6px;
+}
+
+.gd-textarea {
+  padding: 4px 6px;
+  resize: none;
+}
+
+.gd-mono {
+  font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.gd-input:focus,
+.gd-textarea:focus,
+.gd-combobox:focus {
+  outline: 2px solid rgba(47, 111, 208, 0.35);
+  outline-offset: -1px;
+}
+
+.gd-checkbox,
+.gd-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.gd-panel {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  border-radius: var(--gd-radius);
+  overflow: hidden; /* scroll: none clips; scroll: auto sets overflow inline */
+}
+
+.gd-panel.gd-no-border {
+  box-shadow: none;
+}
+
+/* --- toggle: a checkbox drawn as a switch ---------------------------------- */
+
+/* No position here: .gd-node already makes the widget absolute, which is what the hidden
+   checkbox is placed against. */
+.gd-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.gd-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.gd-toggle-track {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 18px;
+  border-radius: 9px;
+  background: #b4bfcd;
+  position: relative;
+  transition: background 0.15s;
+}
+
+.gd-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 22, 33, 0.35);
+  transition: left 0.15s;
+}
+
+.gd-toggle input:checked + .gd-toggle-track {
+  background: var(--gd-accent);
+}
+
+.gd-toggle input:checked + .gd-toggle-track::after {
+  left: 18px;
+}
+
+.gd-toggle input:focus-visible + .gd-toggle-track {
+  outline: 2px solid rgba(47, 111, 208, 0.35);
+  outline-offset: 1px;
+}
+
+/* --- slider ----------------------------------------------------------------- */
+
+.gd-slider {
+  margin: 0;
+  padding: 0;
+  accent-color: var(--gd-accent);
+  cursor: pointer;
+}
+
+/* --- list box --------------------------------------------------------------- */
+
+.gd-listbox {
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  color: inherit;
+  font: inherit;
+  padding: 2px 0;
+  overflow: auto;
+}
+
+.gd-listbox option {
+  padding: 3px 8px;
+}
+
+.gd-listbox:focus {
+  outline: 2px solid rgba(47, 111, 208, 0.35);
+  outline-offset: -1px;
+}
+
+/* --- progress bar ----------------------------------------------------------- */
+
+.gd-progressbar {
+  background: #d9dfe8;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.gd-progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--gd-accent);
+  border-radius: inherit;
+  transition: width 0.2s;
+}
+
+.gd-progress-indeterminate .gd-progress-fill {
+  width: 35% !important;
+  position: absolute;
+  animation: gd-progress-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes gd-progress-slide {
+  0% {
+    left: -35%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* --- image ------------------------------------------------------------------ */
+
+.gd-image {
+  overflow: hidden;
+  border-radius: var(--gd-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gd-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.gd-image-placeholder {
+  display: none;
+  color: var(--gd-muted);
+  font-size: 12px;
+  padding: 4px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.gd-image.gd-image-empty {
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  background: repeating-linear-gradient(45deg, #f3f5f9 0 8px, #e9edf3 8px 16px);
+}
+
+.gd-image.gd-image-empty img {
+  display: none;
+}
+
+.gd-image.gd-image-empty .gd-image-placeholder {
+  display: block;
+}
+
+/* --- badge ------------------------------------------------------------------ */
+
+.gd-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #e3e8f0;
+  color: #3b4657;
+}
+
+.gd-badge[data-tone='info'] {
+  background: #dbe8fb;
+  color: #1f4f9c;
+}
+
+.gd-badge[data-tone='success'] {
+  background: #d9f2e3;
+  color: #1c6b3c;
+}
+
+.gd-badge[data-tone='warning'] {
+  background: #fdf0d3;
+  color: #8a5a00;
+}
+
+.gd-badge[data-tone='danger'] {
+  background: #fbe0dd;
+  color: #9b2a1c;
+}
+
+/* --- separator -------------------------------------------------------------- */
+
+/* Overflow stays visible: a caption is taller than the thin box a plain rule needs. */
+.gd-separator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gd-muted);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.gd-separator::before,
+.gd-separator::after {
+  content: '';
+  flex: 1 1 auto;
+  border-top: 1px solid var(--gd-line);
+}
+
+.gd-separator-text {
+  white-space: nowrap;
+}
+
+.gd-separator-text[hidden] {
+  display: none;
+}
+
+.gd-separator.gd-separator-vertical {
+  flex-direction: column;
+}
+
+.gd-separator.gd-separator-vertical::before,
+.gd-separator.gd-separator-vertical::after {
+  border-top: none;
+  border-left: 1px solid var(--gd-line);
+}
+
+.gd-separator.gd-separator-vertical .gd-separator-text {
+  writing-mode: vertical-rl;
+}
+
+/* --- markdown --------------------------------------------------------------- */
+
+.gd-markdown {
+  overflow: auto;
+  padding: 4px 8px;
+  line-height: 1.45;
+}
+
+.gd-markdown > :first-child {
+  margin-top: 0;
+}
+
+.gd-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.gd-markdown h1,
+.gd-markdown h2,
+.gd-markdown h3,
+.gd-markdown h4,
+.gd-markdown h5,
+.gd-markdown h6 {
+  margin: 0.6em 0 0.3em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.gd-markdown h1 {
+  font-size: 20px;
+}
+
+.gd-markdown h2 {
+  font-size: 17px;
+}
+
+.gd-markdown h3 {
+  font-size: 15px;
+}
+
+.gd-markdown p,
+.gd-markdown ul,
+.gd-markdown ol,
+.gd-markdown blockquote,
+.gd-markdown pre,
+.gd-markdown table {
+  margin: 0.4em 0;
+}
+
+.gd-markdown ul,
+.gd-markdown ol {
+  padding-left: 22px;
+}
+
+.gd-markdown code {
+  font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  background: rgba(31, 39, 51, 0.07);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.gd-markdown pre {
+  background: rgba(31, 39, 51, 0.06);
+  padding: 8px 10px;
+  border-radius: var(--gd-radius);
+  overflow: auto;
+}
+
+.gd-markdown pre code {
+  background: none;
+  padding: 0;
+}
+
+.gd-markdown blockquote {
+  border-left: 3px solid var(--gd-line);
+  padding: 2px 10px;
+  color: var(--gd-muted);
+}
+
+.gd-markdown hr {
+  border: none;
+  border-top: 1px solid var(--gd-line);
+  margin: 0.8em 0;
+}
+
+.gd-markdown a {
+  color: var(--gd-accent);
+}
+
+.gd-markdown img {
+  max-width: 100%;
+}
+
+.gd-markdown table {
+  border-collapse: collapse;
+}
+
+.gd-markdown th,
+.gd-markdown td {
+  border: 1px solid var(--gd-line);
+  padding: 3px 8px;
+  text-align: left;
+}
+
+.gd-markdown th {
+  background: rgba(31, 39, 51, 0.05);
+}
+
+/* --- web view --------------------------------------------------------------- */
+
+.gd-webview {
+  overflow: hidden;
+  border-radius: var(--gd-radius);
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gd-webview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: var(--gd-field);
+}
+
+.gd-webview-placeholder {
+  display: none;
+  color: var(--gd-muted);
+  font-size: 12px;
+}
+
+.gd-webview.gd-webview-empty,
+.gd-webview.gd-webview-deferred {
+  background: repeating-linear-gradient(45deg, #f3f5f9 0 8px, #e9edf3 8px 16px);
+}
+
+.gd-webview.gd-webview-empty iframe,
+.gd-webview.gd-webview-deferred iframe {
+  display: none;
+}
+
+.gd-webview.gd-webview-empty .gd-webview-placeholder,
+.gd-webview.gd-webview-deferred .gd-webview-placeholder {
+  display: block;
+}
+
+/* --- message boxes, toasts, busy overlay ------------------------------------ */
+
+.gd-dialog {
+  width: 380px;
+  max-width: 92vw;
+}
+
+.gd-dialog-body {
+  padding: 16px 16px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gd-dialog-text {
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.gd-dialog-input {
+  height: 28px;
+}
+
+.gd-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px 16px;
+}
+
+.gd-dialog-buttons .gd-button {
+  height: 28px;
+  min-width: 76px;
+}
+
+.gd-toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.gd-toast {
+  pointer-events: auto;
+  min-width: 200px;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #2b3646;
+  color: #fff;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(15, 22, 33, 0.3);
+  cursor: pointer;
+  animation: gd-toast-in 0.18s ease-out;
+}
+
+.gd-toast[data-tone='info'] {
+  background: #1f4f9c;
+}
+
+.gd-toast[data-tone='success'] {
+  background: #1c6b3c;
+}
+
+.gd-toast[data-tone='warning'] {
+  background: #8a5a00;
+}
+
+.gd-toast[data-tone='danger'] {
+  background: #9b2a1c;
+}
+
+.gd-toast-leaving {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.18s, transform 0.18s;
+}
+
+@keyframes gd-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gd-busy {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--gd-muted);
+  cursor: progress;
+}
+
+.gd-busy-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(47, 111, 208, 0.25);
+  border-top-color: var(--gd-accent);
+  animation: gd-busy-spin 0.8s linear infinite;
+}
+
+.gd-busy-text:empty {
+  display: none;
+}
+
+@keyframes gd-busy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- group box: a panel with a caption bar ---------------------------------- */
+
+.gd-groupbox {
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: transparent;
+}
+
+/* The caption is a button so an expandable box can fold on click; otherwise it is inert. */
+.gd-groupbox-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 22px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--gd-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gd-line);
+  text-align: left;
+  cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gd-groupbox-expandable .gd-groupbox-caption {
+  cursor: pointer;
+}
+
+.gd-groupbox-expandable .gd-groupbox-caption:hover {
+  color: var(--gd-fg);
+}
+
+.gd-groupbox-chevron {
+  display: none;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform 0.15s;
+}
+
+.gd-groupbox-expandable .gd-groupbox-chevron {
+  display: block;
+}
+
+.gd-groupbox-collapsed .gd-groupbox-chevron {
+  transform: rotate(-45deg);
+}
+
+.gd-groupbox-collapsed .gd-groupbox-caption {
+  border-bottom: none;
+}
+
+.gd-groupbox-collapsed .gd-groupbox-body {
+  display: none;
+}
+
+.gd-groupbox-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 22px;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.gd-tabcontrol {
+  display: flex;
+  flex-direction: column;
+}
+
+.gd-tab-headers {
+  height: 32px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 0 0 32px;
+  border-bottom: 1px solid var(--gd-line);
+}
+
+.gd-tab-header {
+  font: inherit;
+  height: 26px;
+  padding: 0 14px;
+  border: 1px solid var(--gd-line);
+  border-bottom: none;
+  border-radius: var(--gd-radius) var(--gd-radius) 0 0;
+  background: #e2e7ef;
+  color: var(--gd-muted);
+  cursor: pointer;
+}
+
+.gd-tab-header-active {
+  background: var(--gd-field);
+  color: var(--gd-fg);
+  height: 30px;
+}
+
+/* --- the tab control's other faces: numbered steps, or no header at all ------------ */
+
+.gd-tabcontrol[data-header='none'] .gd-tab-headers {
+  display: none;
+}
+
+/* Without a header strip the body draws the top line the strip's bottom border gave. */
+.gd-tabcontrol[data-header='none'] .gd-tab-body {
+  box-shadow: inset 1px 0 0 var(--gd-line), inset -1px 0 0 var(--gd-line), inset 0 -1px 0 var(--gd-line), inset 0 1px 0 var(--gd-line);
+}
+
+.gd-tabcontrol[data-header='steps'] .gd-tab-headers {
+  align-items: center;
+  gap: 0;
+  padding: 0 8px;
+}
+
+.gd-step,
+.gd-step.gd-tab-header-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 4px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--gd-muted);
+}
+
+.gd-step.gd-tab-header-active {
+  color: var(--gd-fg);
+}
+
+.gd-step + .gd-step::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  margin: 0 4px;
+  background: var(--gd-line);
+}
+
+.gd-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--gd-line);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.gd-step-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 12px;
+}
+
+.gd-step-icon .gd-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.gd-step[data-state='current'] .gd-step-number {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-step[data-state='done'] .gd-step-number {
+  border-color: var(--gd-accent);
+  color: var(--gd-accent);
+}
+
+.gd-tab-body {
+  position: relative;
+  flex: 1 1 auto;
+  background: var(--gd-field);
+  /* Inset shadow instead of a border, so the page keeps the full client area the layout
+     engine assumes for it. */
+  box-shadow: inset 1px 0 0 var(--gd-line), inset -1px 0 0 var(--gd-line), inset 0 -1px 0 var(--gd-line);
+  overflow: hidden;
+}
+
+.gd-tabpage {
+  position: absolute;
+  display: none;
+}
+
+.gd-tabpage-active {
+  display: block;
+}
+
+.gd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 30, 41, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.gd-modal-frame:focus {
+  outline: none;
+}
+
+.gd-modal-frame {
+  display: flex;
+  flex-direction: column;
+  background: var(--gd-surface);
+  border-radius: 6px;
+  box-shadow: 0 18px 48px rgba(15, 22, 33, 0.35);
+  overflow: hidden;
+  max-width: 96vw;
+  max-height: 92vh;
+}
+
+.gd-modal-title,
+.gd-drawer-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  background: #2b3646;
+  color: #fff;
+  font-weight: 600;
+  flex: 0 0 34px;
+}
+
+.gd-modal-close,
+.gd-drawer-close {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: var(--gd-radius);
+}
+
+.gd-modal-close:hover,
+.gd-drawer-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.gd-modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* The form's page: its designed height, so a capped frame scrolls it instead of clipping. */
+.gd-modal-page {
+  position: relative;
+}
+
+/* --- popup: a form floating by a control; the layer catches the click outside ------- */
+
+.gd-popup-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.gd-popup {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-line);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(15, 22, 33, 0.28);
+  overflow: hidden;
+}
+
+.gd-popup:focus {
+  outline: none;
+}
+
+.gd-popup-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.gd-popup-page {
+  position: relative;
+}
+
+/* --- drawer: a form in a panel sliding in from the right; the layer is the backdrop ------- */
+
+/* The layer covers the app from the moment it is appended until the slide-out has ended. It
+   clips the panel while that slides in from beyond the right edge; `clip`, not `hidden`, so a
+   focus() inside the sliding panel (a form's onShow focusing an input) cannot scroll the layer
+   to bring the input into view - that would drag the panel into place in one jump. */
+.gd-drawer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: clip;
+  background: rgba(23, 30, 41, 0);
+  transition: background-color 0.2s ease;
+}
+
+.gd-drawer-layer.gd-drawer-open {
+  background: rgba(23, 30, 41, 0.45);
+}
+
+/* Full height at the right edge; as wide as the form's design, never wider than the window. */
+.gd-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100vw;
+  background: var(--gd-surface);
+  box-shadow: -8px 0 32px rgba(15, 22, 33, 0.3);
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+}
+
+.gd-drawer-open .gd-drawer {
+  transform: none;
+}
+
+.gd-drawer:focus {
+  outline: none;
+}
+
+/* The body scrolls a form taller than the panel; the page fills the body otherwise, with the
+   form's designed height as its minimum, so anchored and docked controls follow the panel. */
+.gd-drawer-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gd-drawer-page {
+  position: relative;
+  flex: 1 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gd-drawer-layer,
+  .gd-drawer {
+    transition: none;
+  }
+}
+
+.gd-error-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 12px;
+  background: #fdecea;
+  color: #8c2016;
+  border-top: 1px solid #f0b7b0;
+  font-family: 'Cascadia Mono', Consolas, monospace;
+  font-size: 12px;
+  z-index: 200;
+}
+
+/* --- the preview's receipt: the form the tab was opened for closed ------- */
+
+.gd-run-closed {
+  max-width: 520px;
+  margin: 48px auto;
+  padding: 24px 28px;
+  background: var(--gd-field);
+  border: 1px solid var(--gd-line);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.gd-run-closed h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gd-muted);
+}
+
+.gd-run-closed pre {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--gd-surface);
+  border-radius: var(--gd-radius);
+  font-family: 'Cascadia Mono', Consolas, monospace;
+  font-size: 12px;
+}
+
+.gd-run-reopen {
+  border: 1px solid transparent;
+  border-radius: var(--gd-radius);
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+  cursor: pointer;
+  padding: 6px 16px;
+  font: inherit;
+}
+
+/* --- splitter: a thin draggable bar between docked panes ------------------ */
+
+.gd-splitter {
+  background: #e3e7ee;
+  touch-action: none;
+}
+
+.gd-splitter[data-axis='x'] {
+  cursor: col-resize;
+}
+
+.gd-splitter[data-axis='y'] {
+  cursor: row-resize;
+}
+
+.gd-splitter:hover,
+.gd-splitter.gd-splitter-active {
+  background: #b9c6d8;
+}
+
+/* --- row / column: stack containers --------------------------------------- */
+
+.gd-stack {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.gd-stack.gd-stack-border {
+  box-shadow: inset 0 0 0 1px var(--gd-line, #d0d4d9);
+}
+
+/* --- frame: another form inside this one ------------------------------------ */
+
+.gd-frame {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.gd-frame-body {
+  position: absolute;
+  inset: 0;
+  overflow: auto; /* an embedded form with scroll: auto scrolls inside a fixed frame */
+}
+
+.gd-frame.gd-frame-border {
+  box-shadow: inset 0 0 0 1px var(--gd-line, #d0d4d9);
+}
+
+/* The empty state on the canvas, and a load failure at run time. */
+.gd-frame-note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: var(--gd-muted);
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* --- repeater: the item template once per row ------------------------------- */
+
+.gd-repeater {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.gd-repeater-fixed {
+  overflow-y: auto;
+}
+
+.gd-repeatertemplate {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.gd-repeatertemplate.gd-repeatertemplate-border {
+  box-shadow: inset 0 0 0 1px var(--gd-line, #d0d4d9);
+}
+
+/* The template itself stays out of sight on the running form; the items are copies of it. */
+.gd-repeater-master {
+  display: none;
+}
+
+/* --- data grid: a Tabulator table dressed in the runtime's colours ------------ */
+
+/* The density presets (the grid's density property, data-density on the host): the row height
+   and the paddings the rules below read. Comfortable is the default and today's sizes. */
+.gd-datagrid {
+  --gd-grid-row: 28px;
+  --gd-grid-cell: 5px 8px;
+  --gd-grid-head: 6px 8px;
+  --gd-grid-edit: 4px 7px;
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  overflow: hidden;
+}
+
+.gd-datagrid[data-density='compact'] {
+  --gd-grid-row: 24px;
+  --gd-grid-cell: 3px 6px;
+  --gd-grid-head: 4px 6px;
+  --gd-grid-edit: 2px 5px;
+}
+
+.gd-datagrid[data-density='spacious'] {
+  --gd-grid-row: 36px;
+  --gd-grid-cell: 9px 10px;
+  --gd-grid-head: 10px 10px;
+  --gd-grid-edit: 8px 9px;
+}
+
+.gd-datagrid-table {
+  position: absolute;
+  inset: 1px;
+}
+
+.gd-datagrid.gd-disabled {
+  pointer-events: none;
+}
+
+/* --- chart: a Chart.js canvas in a frame; the host is what the library measures ------ */
+
+.gd-chart {
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  overflow: hidden;
+}
+
+.gd-chart-host {
+  position: absolute;
+  inset: 8px;
+}
+
+.gd-chart-host canvas {
+  display: block;
+}
+
+.gd-chart.gd-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.gd-chart-error {
+  position: absolute;
+  inset: 8px;
+  color: var(--gd-danger, #b42318);
+  font-size: 12px;
+}
+
+/* --- map: a Leaflet map in a frame; isolated so the library's layers stay inside it ---- */
+
+.gd-map {
+  box-shadow: inset 0 0 0 1px var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.gd-map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.gd-map.gd-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.gd-map-error {
+  position: absolute;
+  inset: 8px;
+  color: var(--gd-danger, #b42318);
+  font-size: 12px;
+}
+
+.gd-datagrid .tabulator {
+  font: inherit;
+  font-size: 13px;
+  border: none;
+  background: transparent;
+  color: var(--gd-fg);
+}
+
+.gd-datagrid .tabulator .tabulator-header {
+  background: var(--gd-surface);
+  border-bottom: 1px solid var(--gd-line);
+  color: var(--gd-fg);
+  font-weight: 600;
+}
+
+.gd-datagrid .tabulator .tabulator-header .tabulator-col {
+  background: transparent;
+  border-right: 1px solid var(--gd-line);
+}
+
+.gd-datagrid .tabulator .tabulator-header .tabulator-col .tabulator-col-content {
+  padding: var(--gd-grid-head);
+}
+
+.gd-datagrid .tabulator .tabulator-header .tabulator-col.tabulator-sortable:hover {
+  background: rgba(47, 111, 208, 0.08);
+}
+
+/* Each row rule also names its colour as --gd-row-tint: what a frozen cell layers over the field
+   colour to look like the rest of its row (see the frozen rules below). */
+.gd-datagrid .tabulator .tabulator-row {
+  --gd-row-tint: transparent;
+  min-height: var(--gd-grid-row);
+  color: var(--gd-fg);
+  background: var(--gd-field);
+  border-bottom: 1px solid #e6eaf0;
+}
+
+.gd-datagrid .tabulator .tabulator-row.tabulator-row-even {
+  --gd-row-tint: #f7f9fc;
+  background: #f7f9fc;
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell {
+  padding: var(--gd-grid-cell);
+  border-right: 1px solid #eef1f5;
+}
+
+.gd-datagrid .tabulator .tabulator-row.tabulator-selectable:hover {
+  --gd-row-tint: rgba(47, 111, 208, 0.08);
+  background: rgba(47, 111, 208, 0.08);
+  cursor: pointer;
+}
+
+.gd-datagrid .tabulator .tabulator-row.tabulator-selected,
+.gd-datagrid .tabulator .tabulator-row.tabulator-selected:hover {
+  --gd-row-tint: rgba(47, 111, 208, 0.18);
+  background: rgba(47, 111, 208, 0.18);
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-editing {
+  border: 1px solid var(--gd-accent);
+  padding: 0;
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-editing input {
+  font: inherit;
+  padding: var(--gd-grid-edit);
+}
+
+/* A cell with attributes (a column's attributesField): the tone sets default colours through two
+   custom properties, an explicit colour overrides them from the cell's own style. Only such
+   cells read the properties; a plain cell gets no declaration here. */
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell[data-tone],
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.gd-cell-colored {
+  color: var(--gd-cell-fg, inherit);
+  background-color: var(--gd-cell-bg, transparent);
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell[data-tone='info'] {
+  --gd-cell-fg: #1f4f9c;
+  --gd-cell-bg: rgba(47, 111, 208, 0.14);
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell[data-tone='success'] {
+  --gd-cell-fg: #1c6b3c;
+  --gd-cell-bg: rgba(28, 107, 60, 0.13);
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell[data-tone='warning'] {
+  --gd-cell-fg: #8a5a00;
+  --gd-cell-bg: rgba(176, 106, 0, 0.14);
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell[data-tone='danger'] {
+  --gd-cell-fg: #9b2a1c;
+  --gd-cell-bg: rgba(155, 42, 28, 0.13);
+}
+
+/* The inline editor sits on a plain field: the real properties, since an explicit colour is an
+   inline custom property no stylesheet rule can override. */
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-editing {
+  color: var(--gd-fg);
+  background-color: var(--gd-field);
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.gd-cell-bold {
+  font-weight: 600;
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.gd-cell-italic {
+  font-style: italic;
+}
+
+.gd-datagrid .tabulator .tabulator-cell .gd-cell-icon {
+  margin-right: 5px;
+}
+
+/* Frozen columns (a column's frozen edge) stay put while the grid scrolls sideways: Tabulator
+   pins their cells (position: sticky) and the skin gives them an opaque back, or the cells
+   scrolling under them would show through. The back is the field colour with the row's tint -
+   and, on a formatted cell, its own tint - layered over it as gradients, so a frozen cell looks
+   exactly like its unfrozen neighbours: striping, hover, selection, tone and explicit colours
+   included. After the tone rules on purpose: same specificity, the later one wins. */
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-frozen {
+  background-color: var(--gd-field);
+  background-image: linear-gradient(var(--gd-row-tint), var(--gd-row-tint));
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-frozen[data-tone],
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-frozen.gd-cell-colored {
+  background-image: linear-gradient(var(--gd-cell-bg, transparent), var(--gd-cell-bg, transparent)), linear-gradient(var(--gd-row-tint), var(--gd-row-tint));
+}
+
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-frozen.tabulator-editing {
+  background-image: none;
+}
+
+.gd-datagrid .tabulator .tabulator-header .tabulator-col.tabulator-frozen {
+  background: var(--gd-surface);
+}
+
+.gd-datagrid .tabulator .tabulator-header .tabulator-col.tabulator-frozen.tabulator-sortable:hover {
+  background-color: var(--gd-surface);
+  background-image: linear-gradient(rgba(47, 111, 208, 0.08), rgba(47, 111, 208, 0.08));
+}
+
+/* The divider at the inner edge of each frozen group, in the runtime's line colour (the theme
+   draws it grey; its rules load after this sheet, so these are a notch more specific). */
+.gd-datagrid .tabulator .tabulator-header .tabulator-col.tabulator-frozen-left,
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-frozen-left {
+  border-right: 2px solid var(--gd-line);
+}
+
+.gd-datagrid .tabulator .tabulator-header .tabulator-col.tabulator-frozen-right,
+.gd-datagrid .tabulator .tabulator-row .tabulator-cell.tabulator-frozen-right {
+  border-left: 2px solid var(--gd-line);
+}
+
+.gd-datagrid .tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents {
+  color: var(--gd-muted);
+  font-size: 13px;
+  font-weight: normal;
+}
+
+.gd-datagrid .tabulator .tabulator-footer {
+  background: var(--gd-surface);
+  border-top: 1px solid var(--gd-line);
+  padding: 4px 8px;
+}
+
+.gd-datagrid .tabulator .tabulator-footer .tabulator-page {
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  color: var(--gd-fg);
+  padding: 2px 8px;
+}
+
+.gd-datagrid .tabulator .tabulator-footer .tabulator-page.active {
+  border-color: var(--gd-accent);
+  color: var(--gd-accent);
+}
+
+/* --- icons: one <svg><use> per icon, drawn from the Lucide sprite ---------------- */
+
+.gd-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: 0 0 auto;
+}
+
+/* --- tree view: nested rows with a chevron, an optional check box and an icon --- */
+
+.gd-treeview {
+  border: 1px solid var(--gd-line);
+  border-radius: var(--gd-radius);
+  background: var(--gd-field);
+  overflow: auto;
+  padding: 2px 0;
+  outline: none;
+  user-select: none;
+}
+
+.gd-treeview:focus-visible {
+  outline: 2px solid rgba(47, 111, 208, 0.35);
+  outline-offset: -1px;
+}
+
+.gd-treeview.gd-disabled {
+  pointer-events: none;
+}
+
+.gd-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding-right: 8px;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.gd-tree-row:hover {
+  background: rgba(47, 111, 208, 0.08);
+}
+
+.gd-tree-row-selected,
+.gd-tree-row-selected:hover {
+  background: rgba(47, 111, 208, 0.18);
+}
+
+.gd-treeview:focus .gd-tree-row-selected {
+  background: var(--gd-accent);
+  color: var(--gd-accent-fg);
+}
+
+.gd-tree-chevron {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gd-muted);
+  cursor: pointer;
+}
+
+.gd-treeview:focus .gd-tree-row-selected .gd-tree-chevron {
+  color: inherit;
+}
+
+.gd-tree-chevron::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.12s ease;
+}
+
+.gd-tree-row[aria-expanded='true'] .gd-tree-chevron::before {
+  transform: rotate(45deg);
+}
+
+.gd-tree-chevron-leaf {
+  visibility: hidden;
+  cursor: default;
+}
+
+.gd-tree-check {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.gd-tree-icon {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gd-muted);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.gd-tree-icon .gd-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.gd-treeview:focus .gd-tree-row-selected .gd-tree-icon {
+  color: inherit;
+}
+
+.gd-tree-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- icons on links, badges, inputs, tabs, group boxes, dialogs and toasts ------ */
+
+.gd-link-icon,
+.gd-badge-icon,
+.gd-tab-icon,
+.gd-groupbox-icon,
+.gd-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.gd-link-icon .gd-icon,
+.gd-tab-icon .gd-icon,
+.gd-groupbox-icon .gd-icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* The Icon widget: the glyph fills the box, so the control's size is the icon's. An emoji
+   is sized from the box through container query units. */
+.gd-iconbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+  overflow: hidden;
+}
+
+.gd-iconbox-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 80cqmin;
+  line-height: 1;
+}
+
+.gd-iconbox .gd-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.gd-iconbox.gd-disabled {
+  opacity: 0.5;
+}
+
+.gd-badge-icon .gd-icon {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+
+.gd-badge-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gd-tab-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gd-input-wrap {
+  display: block;
+}
+
+.gd-input-wrap .gd-input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.gd-input-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  color: var(--gd-muted);
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.gd-input-icon .gd-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.gd-input-with-icon {
+  padding-left: 30px;
+}
+
+/* --- autocomplete: the suggestion list, on the body so no container clips it ------- */
+
+.gd-autocomplete-list {
+  position: fixed;
+  z-index: 250;
+  box-sizing: border-box;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--gd-field, #fff);
+  border: 1px solid var(--gd-line, #d0d4d9);
+  border-radius: var(--gd-radius, 4px);
+  box-shadow: 0 6px 18px rgba(24, 33, 46, 0.16);
+  font-size: 13px;
+  color: var(--gd-text, #1f2937);
+}
+
+.gd-autocomplete-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gd-autocomplete-item:hover,
+.gd-autocomplete-item-active {
+  background: var(--gd-accent-soft, #e8f0fe);
+}
+
+.gd-dialog-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.gd-dialog-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  margin-top: -1px;
+  color: var(--gd-muted);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.gd-dialog-icon .gd-icon {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.75;
+}
+
+.gd-dialog-icon[data-tone='info'] {
+  color: var(--gd-accent);
+}
+
+.gd-dialog-icon[data-tone='success'] {
+  color: #1c6b3c;
+}
+
+.gd-dialog-icon[data-tone='warning'] {
+  color: #b26a00;
+}
+
+.gd-dialog-icon[data-tone='danger'] {
+  color: var(--gd-danger);
+}
+
+.gd-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.gd-toast-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  line-height: 1;
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.gd-toast-icon .gd-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.gd-toast-text {
+  flex: 1 1 auto;
+}

@@ -1,55 +1,56 @@
-// The form preview: /run/<Module.Form> shows one form on its own, and /run/api is the surface
-// that page talks to. It is a developer's tool: under the preview host every request here has
-// already passed the project's preview session, which the host states in a header, and the
-// app's own sign-in is not asked for - scripts see `user` as null. Standalone, with no host in
-// front, the preview asks for the app's sign-in like the shell does.
-import express from 'express';
-import path from 'node:path';
-import { config } from '../config.js';
-import * as store from '../store.js';
-import { attachUser, authEnabled } from '../auth/guard.js';
-import { readFormHandler, readClientScriptHandler, execHandler, uploadHandlers, chunkBody, downloadHandler } from './app.js';
-import { previewVouched } from '../runner-trust.js';
+// Entry point for /run/<FormName>: one form on its own, the way the designer's Run button
+// opens it. The URL follows navigation (/run/<Form>?args=), so Back, Forward and a reload land
+// where the form was; there is no start form, so closing the form the tab was opened for shows
+// a receipt in its place.
+import { RuntimeApp, formUrl } from './app.js';
+import { onUnauthorized, setApiBase } from './endpoints.js';
 
-export const run = express.Router();
+// The preview's own surface: under the preview host it needs no app sign-in.
+setApiBase('/run/api');
 
-run.use(attachUser);
+// A preview under authentication whose session ended mid-way goes to the login page and back.
+onUnauthorized(() => location.assign(`/app/login?next=${encodeURIComponent(location.pathname + location.search)}`));
 
-// Passes with sign-in off, an app user, or a preview session vouched for by the host - a mark
-// that counts only when it comes with the runner's own secret. Without a secret there is no
-// host to vouch for anything (a deployed app, a runner started by hand), so the mark is ignored
-// and the preview asks for the app's sign-in like everything else.
-function previewGuard({ page = false } = {}) {
-  return (req, res, next) => {
-    if (!authEnabled() || req.user || previewVouched(req)) {
-      next();
-      return;
-    }
-    if (page) res.redirect(`/app/login?next=${encodeURIComponent(req.originalUrl || '/app')}`);
-    else res.status(401).json({ error: { message: 'Sign in to continue.', code: 'unauthenticated' } });
-  };
+const host = document.getElementById('gd-app');
+const errorBar = document.getElementById('gd-error');
+
+function showError(err, where) {
+  errorBar.hidden = false;
+  errorBar.textContent = `${where}: ${err.message}`;
 }
 
-run.get('/api/forms/:name', previewGuard(), readFormHandler);
-run.get('/api/client-scripts/:name', previewGuard(), readClientScriptHandler);
-run.post('/api/exec/:target', previewGuard(), execHandler);
-run.post('/api/uploads', previewGuard(), uploadHandlers.create);
-run.put('/api/uploads/:batchId/:uploadId/:index', previewGuard(), chunkBody, uploadHandlers.chunk);
-run.get('/api/uploads/:batchId', previewGuard(), uploadHandlers.state);
-run.post('/api/uploads/:batchId/complete', previewGuard(), uploadHandlers.complete);
-run.delete('/api/uploads/:batchId', previewGuard(), uploadHandlers.abort);
-run.get('/api/download/:target', previewGuard(), downloadHandler);
+const name = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '');
+const args = readArgs();
 
-// The page; the form name in the URL tells it where to start.
-run.get('/:name', previewGuard({ page: true }), async (req, res, next) => {
+function readArgs() {
+  const raw = new URLSearchParams(location.search).get('args');
+  if (!raw) return undefined;
   try {
-    store.assertQualified(req.params.name);
-    if (!(await store.exists('forms', req.params.name))) {
-      res.status(404).send(`Form "${req.params.name}" does not exist.`);
-      return;
-    }
-    res.sendFile(path.join(config.rootDir, 'public', 'run.html'));
-  } catch (err) {
-    next(err);
+    return JSON.parse(raw);
+  } catch {
+    return raw;
   }
-});
+}
+
+// The form the tab was opened for closed: a receipt in its place - which form, what it handed
+// back - and a way to run it again with the same arguments.
+function onClosed({ name: closedName, args: closedArgs, result }) {
+  const card = document.createElement('div');
+  card.className = 'gd-run-closed';
+  const title = document.createElement('h2');
+  title.textContent = `${closedName} closed`;
+  const value = document.createElement('pre');
+  value.textContent = result === undefined ? 'result: undefined' : `result: ${JSON.stringify(result, null, 2)}`;
+  const reopen = document.createElement('button');
+  reopen.type = 'button';
+  reopen.className = 'gd-run-reopen';
+  reopen.textContent = 'Reopen';
+  reopen.addEventListener('click', () => app.start(closedName, closedArgs).catch((err) => showError(err, `form ${closedName}`)));
+  card.append(title, value, reopen);
+  host.replaceChildren(card);
+}
+
+const app = new RuntimeApp(host, { onError: showError, home: null, urlFor: (formName, formArgs) => formUrl('/run', formName, formArgs), onClosed });
+window.gdApp = app;
+
+app.start(name, args).catch((err) => showError(err, `form ${name}`));
