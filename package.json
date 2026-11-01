@@ -1,0 +1,21 @@
+{
+  "name": "hot-summer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "HOT SUMMER - built with AppMaker",
+  "scripts": {
+    "start": "node server/project-server.js"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "express": "^4.19.2",
+    "leaflet": "^1.9.4",
+    "lucide-static": "^1.40.0",
+    "nodemailer": "^7.0.13",
+    "tabulator-tables": "^6.5.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

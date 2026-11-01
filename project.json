@@ -1,0 +1,86 @@
+{
+  "name": "HOT SUMMER",
+  "description": "HOT SUMMER es un resort tropical virtual y red social privada para los integrantes de un Team. Cada integrante tiene su cuenta y perfil, gana Shells (SH) con misiones diarias, los gasta en la Tienda del resort y comparte publicaciones, fotos, me gusta y comentarios en la Comunidad. Un panel de Administración protegido por contraseña permite gestionar perfiles, saldos, misiones, comprobantes, artículos, solicitudes, reportes y estadísticas.",
+  "shell": "classic",
+  "logo": "",
+  "startForm": "Main.Inicio",
+  "menu": [
+    {
+      "label": "HOT SUMMER",
+      "icon": "palmtree",
+      "items": [
+        {
+          "label": "Inicio",
+          "icon": "house",
+          "form": "Main.Inicio",
+          "args": null,
+          "roles": []
+        },
+        {
+          "label": "Comunidad",
+          "icon": "users",
+          "form": "Main.Comunidad",
+          "args": null,
+          "roles": []
+        },
+        {
+          "label": "Tienda",
+          "icon": "shopping-bag",
+          "form": "Main.Tienda",
+          "args": null,
+          "roles": []
+        },
+        {
+          "label": "Misiones",
+          "icon": "target",
+          "form": "Main.Misiones",
+          "args": null,
+          "roles": []
+        },
+        {
+          "label": "Billetera",
+          "icon": "wallet",
+          "form": "Main.Billetera",
+          "args": null,
+          "roles": []
+        },
+        {
+          "label": "Mi perfil",
+          "icon": "circle-user",
+          "form": "Main.Perfil",
+          "args": null,
+          "roles": []
+        },
+        {
+          "label": "Administración",
+          "icon": "shield",
+          "form": "Main.Administracion",
+          "args": null,
+          "roles": []
+        }
+      ]
+    }
+  ],
+  "showGroups": false,
+  "auth": {
+    "enabled": true,
+    "template": "cover",
+    "title": "HOT SUMMER",
+    "tagline": "Resort tropical privado del Team",
+    "accent": "#12A6A0",
+    "selfRegister": "open",
+    "newUsersActive": true,
+    "roles": [
+      "Administrator",
+      "User"
+    ]
+  },
+  "mail": {
+    "host": "",
+    "port": 587,
+    "secure": false,
+    "user": "",
+    "passwordSecret": "SMTP_PASSWORD",
+    "from": ""
+  }
+}

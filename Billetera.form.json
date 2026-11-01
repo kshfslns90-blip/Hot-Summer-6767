@@ -1,0 +1,2 @@
+{ "name": "Billetera", "type": "form", "text": "Billetera", "width": 1000, "height": 700, "props": { "backColor": "#FFF0D0", "scroll": "none" }, "events": {},
+  "children": [ { "id": "view", "type": "panel", "left": 0, "top": 0, "width": 1000, "height": 700, "anchor": ["left","top"], "dock": "fill", "props": { "border": false, "scroll": "auto", "backColor": "#FFF0D0" }, "events": {}, "children": [] } ] }

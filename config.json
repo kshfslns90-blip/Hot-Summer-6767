@@ -1,0 +1,26 @@
+{
+  "mode": "app",
+  "dataDir": "data",
+  "runtimeDir": "data_runtime",
+  "port": 3000,
+  "bindHost": "0.0.0.0",
+  "serverRequireAllow": [
+    "path",
+    "url",
+    "util",
+    "crypto",
+    "buffer",
+    "querystring",
+    "string_decoder",
+    "events",
+    "os",
+    "zlib",
+    "stream",
+    "fs",
+    "fs/promises",
+    "http",
+    "https",
+    "dns",
+    "net"
+  ]
+}

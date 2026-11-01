@@ -1,0 +1,812 @@
+{
+  "tables": [
+    {
+      "name": "members",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "username",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "avatar",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "team_role",
+          "type": "TEXT",
+          "dflt": "'Integrante'"
+        },
+        {
+          "name": "bio",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "balance",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "earned",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "spent",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "missions_done",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'activo'"
+        },
+        {
+          "name": "joined_at",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "last_seen",
+          "type": "TEXT"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "members_user_id",
+          "columns": [
+            "user_id"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "movements",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "member_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "amount",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "by_admin",
+          "type": "INTEGER",
+          "dflt": "0"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "movements_member_id",
+          "columns": [
+            "member_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "shop_items",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "image",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "duration_label",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "duration_hours",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "needs_review",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1"
+        },
+        {
+          "name": "sort",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        }
+      ],
+      "indexes": [],
+      "seed": [
+        {
+          "id": 1,
+          "name": "Cambio de rol",
+          "description": "Cambia tu rol actual en el Team por uno nuevo de tu elección.",
+          "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70",
+          "price": 500,
+          "duration_label": "Permanente",
+          "duration_hours": 0,
+          "needs_review": 1,
+          "active": 1,
+          "sort": 1
+        },
+        {
+          "id": 2,
+          "name": "Segundo rol",
+          "description": "Obtén un segundo rol permanente dentro del Team.",
+          "image": "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=800&q=70",
+          "price": 800,
+          "duration_label": "Permanente",
+          "duration_hours": 0,
+          "needs_review": 1,
+          "active": 1,
+          "sort": 2
+        },
+        {
+          "id": 3,
+          "name": "Permiso para utilizar ropa",
+          "description": "Permiso especial válido durante 24 horas.",
+          "image": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=70",
+          "price": 150,
+          "duration_label": "24 horas",
+          "duration_hours": 24,
+          "needs_review": 0,
+          "active": 1,
+          "sort": 3
+        },
+        {
+          "id": 4,
+          "name": "Petición obligatoria",
+          "description": "Realiza una petición que deberá cumplirse durante 24 horas.",
+          "image": "https://images.unsplash.com/photo-1520483601560-389dff434fdf?w=800&q=70",
+          "price": 600,
+          "duration_label": "24 horas",
+          "duration_hours": 24,
+          "needs_review": 1,
+          "active": 1,
+          "sort": 4
+        },
+        {
+          "id": 5,
+          "name": "Un integrante",
+          "description": "Elige a un integrante del Team para una petición.",
+          "image": "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=800&q=70",
+          "price": 400,
+          "duration_label": "Por petición",
+          "duration_hours": 0,
+          "needs_review": 1,
+          "active": 1,
+          "sort": 5
+        },
+        {
+          "id": 6,
+          "name": "Juguetes",
+          "description": "Un juguete a tu elección. Precio por artículo.",
+          "image": "https://images.unsplash.com/photo-1559599746-8823b38544c6?w=800&q=70",
+          "price": 250,
+          "duration_label": "Por artículo",
+          "duration_hours": 0,
+          "needs_review": 0,
+          "active": 1,
+          "sort": 6
+        },
+        {
+          "id": 7,
+          "name": "Poción",
+          "description": "Una poción misteriosa del resort. Precio por botella.",
+          "image": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&q=70",
+          "price": 200,
+          "duration_label": "Por botella",
+          "duration_hours": 0,
+          "needs_review": 0,
+          "active": 1,
+          "sort": 7
+        }
+      ]
+    },
+    {
+      "name": "purchases",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "member_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "item_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "item_name",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "price",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "duration_label",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "duration_hours",
+          "type": "INTEGER",
+          "dflt": "0"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "request_key",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "starts_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "expires_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "admin_note",
+          "type": "TEXT",
+          "dflt": "''"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "purchases_request_key",
+          "columns": [
+            "request_key"
+          ],
+          "unique": true
+        },
+        {
+          "name": "purchases_member_id",
+          "columns": [
+            "member_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "missions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "reward",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        },
+        {
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'evidence'"
+        },
+        {
+          "name": "active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1"
+        },
+        {
+          "name": "sort",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        }
+      ],
+      "indexes": [],
+      "seed": [
+        {
+          "id": 1,
+          "name": "Ingreso diario",
+          "description": "Reclama tu bono por entrar al resort hoy.",
+          "reward": 100,
+          "kind": "auto",
+          "active": 1,
+          "sort": 1
+        },
+        {
+          "id": 2,
+          "name": "Participar en una dinámica",
+          "description": "Registra tu participación en una dinámica del Team para verificación.",
+          "reward": 150,
+          "kind": "verify",
+          "active": 1,
+          "sort": 2
+        },
+        {
+          "id": 3,
+          "name": "Completar un rol corto",
+          "description": "Envía el comprobante de tu rol corto.",
+          "reward": 200,
+          "kind": "evidence",
+          "active": 1,
+          "sort": 3
+        },
+        {
+          "id": 4,
+          "name": "Completar un rol largo",
+          "description": "Envía el comprobante de tu rol largo.",
+          "reward": 350,
+          "kind": "evidence",
+          "active": 1,
+          "sort": 4
+        },
+        {
+          "id": 5,
+          "name": "Hacer promoción (+5 advs)",
+          "description": "Envía el comprobante de tus 5 o más anuncios de promoción.",
+          "reward": 250,
+          "kind": "evidence",
+          "active": 1,
+          "sort": 5
+        }
+      ]
+    },
+    {
+      "name": "mission_claims",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "member_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "mission_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "mission_name",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "day",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "reward",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "evidence_text",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "evidence_image",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "reviewed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "admin_note",
+          "type": "TEXT",
+          "dflt": "''"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "mission_claims_member_id_mission_id_day",
+          "columns": [
+            "member_id",
+            "mission_id",
+            "day"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "posts",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "member_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "image",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "hidden",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "posts_created_at",
+          "columns": [
+            "created_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "comments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "post_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "member_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "comments_post_id",
+          "columns": [
+            "post_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "name": "likes",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "post_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "member_id",
+          "type": "INTEGER",
+          "notnull": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "likes_post_id_member_id",
+          "columns": [
+            "post_id",
+            "member_id"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "follows",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "follower_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "followed_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "follows_follower_id_followed_id",
+          "columns": [
+            "follower_id",
+            "followed_id"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "reports",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "reporter_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "target_type",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "target_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "dflt": "''"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'pendiente'"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "resolved_at",
+          "type": "TEXT"
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "settings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": true
+        },
+        {
+          "name": "value",
+          "type": "TEXT",
+          "dflt": "''"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "settings_key",
+          "columns": [
+            "key"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "admin_sessions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "INTEGER",
+          "notnull": true
+        },
+        {
+          "name": "expires_at",
+          "type": "TEXT",
+          "notnull": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "admin_sessions_user_id",
+          "columns": [
+            "user_id"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "seed": [
+        {
+          "email": "ana@hotsummer.test",
+          "name": "Ana",
+          "role": "User",
+          "active": 1,
+          "passwordHash": "scrypt$HzhhZ50Nwu9ZdDrsdQV7lw==$yUNLKwmDRRwI0JUIaAJ1N+QGUULdWP1Zh4BA9Oo9QTqYQUB3irnTfIGAXBOW0KPYKlqf38ngzeIMcsqlZMbNEw=="
+        }
+      ]
+    }
+  ],
+  "secrets": []
+}
