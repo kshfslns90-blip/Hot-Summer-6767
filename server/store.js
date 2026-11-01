@@ -498,3 +498,212 @@ export function bindStore(where) {
   }
 
   // The names of a kind: plain for jobs and workflows, "Module.Name"
+  // by module in the modules' order.
+  async function list(kind) {
+    const { suffix, scoped } = KINDS[assertKind(kind)];
+    if (!scoped) return listIn(dirOf(kind), suffix);
+    const out = [];
+    for (const module of await listModules()) {
+      for (const name of await listIn(dirOf(kind, module), suffix)) out.push(`${module}.${name}`);
+    }
+    return out;
+  }
+
+  // The explorer's groups: the modules first (so an empty module still shows), then every kind
+  // with its names.
+  async function tree() {
+    const kinds = Object.keys(KINDS);
+    const lists = await Promise.all(kinds.map(list));
+    return [
+      { kind: 'modules', label: 'Modules', items: await listModules() },
+      ...kinds.map((kind, i) => ({ kind, label: KINDS[kind].label, items: lists[i] }))
+    ];
+  }
+
+  async function exists(kind, name) {
+    const file = KINDS[assertKind(kind)].hasDoc ? docPath(kind, name) : codePath(kind, name);
+    try {
+      await fs.access(file);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async function readText(file, fallback) {
+    try {
+      return await fs.readFile(await inside(file), 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT' && fallback !== undefined) return fallback;
+      throw err;
+    }
+  }
+
+  async function read(kind, name) {
+    assertKind(kind);
+    assertArtifact(kind, name);
+    if (!(await exists(kind, name))) throw new StoreError(`${kind}/${name} does not exist.`, 404);
+
+    const { hasDoc, docKey } = KINDS[kind];
+    if (hasDoc) {
+      const raw = await readText(docPath(kind, name));
+      let doc;
+      try {
+        doc = JSON.parse(raw);
+      } catch (err) {
+        throw new StoreError(`"${name}" has an invalid ${docKey} file: ${err.message}`, 500);
+      }
+      doc.name = shortName(kind, name);
+      if (KINDS[kind].hasCode === false) return { kind, name, [docKey]: doc };
+      return { kind, name, [docKey]: doc, code: await readText(codePath(kind, name), '') };
+    }
+    return { kind, name, code: await readText(codePath(kind, name), '') };
+  }
+
+  async function write(kind, name, payload) {
+    assertKind(kind);
+    const p = parts(kind, name);
+    if (KINDS[kind].scoped && !(await moduleExists(p.module))) throw new StoreError(`Module "${p.module}" does not exist.`, 404);
+    await fs.mkdir(dirOf(kind, p.module), { recursive: true });
+    const { hasDoc, docKey } = KINDS[kind];
+    const code = payload.code;
+
+    if (hasDoc) {
+      const doc = payload[docKey];
+      if (doc && typeof doc === 'object') {
+        doc.name = p.name;
+        await fs.writeFile(await inside(docPath(kind, name)), `${JSON.stringify(doc, null, 2)}\n`, 'utf8');
+      }
+      if (KINDS[kind].hasCode !== false && typeof code === 'string') {
+        await fs.writeFile(await inside(codePath(kind, name)), code, 'utf8');
+      }
+    } else {
+      if (typeof code !== 'string') throw new StoreError('A script or a note needs its "code" property.');
+      await fs.writeFile(await inside(codePath(kind, name)), code, 'utf8');
+    }
+    return read(kind, name);
+  }
+
+  // `template` picks a starting code other than the kind's usual one ('data-source' for a server
+  // script); an unknown one is the usual.
+  async function create(kind, name, { template } = {}) {
+    assertKind(kind);
+    assertArtifact(kind, name);
+    if (await exists(kind, name)) throw new StoreError(`${kind}/${name} already exists.`, 409);
+    const { hasDoc, docKey, hasCode } = KINDS[kind];
+    return write(kind, name, {
+      ...(hasDoc ? { [docKey]: defaultDoc(kind, shortName(kind, name)) } : {}),
+      ...(hasCode === false ? {} : { code: defaultCode(kind, name, template) })
+    });
+  }
+
+  // Removing a link removes the link, never what it points at, so no containment check here:
+  // it is how a planted one is got rid of.
+  async function remove(kind, name) {
+    assertKind(kind);
+    assertArtifact(kind, name);
+    if (!(await exists(kind, name))) throw new StoreError(`${kind}/${name} does not exist.`, 404);
+    if (KINDS[kind].hasCode !== false) await fs.rm(codePath(kind, name), { force: true });
+    if (KINDS[kind].hasDoc) await fs.rm(docPath(kind, name), { force: true });
+    return { kind, name, deleted: true };
+  }
+
+  // For a scoped kind the new name may carry another module: the rename is then a move.
+  async function rename(kind, name, newName) {
+    assertKind(kind);
+    assertArtifact(kind, name);
+    assertArtifact(kind, newName);
+    if (name === newName) return read(kind, name);
+    if (!(await exists(kind, name))) throw new StoreError(`${kind}/${name} does not exist.`, 404);
+    if (await exists(kind, newName)) throw new StoreError(`${kind}/${newName} already exists.`, 409);
+
+    const current = await read(kind, name);
+    if (KINDS[kind].hasDoc) current[KINDS[kind].docKey].name = shortName(kind, newName);
+    await write(kind, newName, current);
+    await remove(kind, name);
+    return read(kind, newName);
+  }
+
+  // A copy under a new name: the document with the copy's own short name, the code behind as it
+  // is (it names controls by id, which the copy keeps). A job's copy starts with its schedule
+  // off, so a duplicate never fires by itself; an API's copy starts disabled, since its route
+  // is the original's.
+  async function duplicate(kind, name, newName) {
+    assertKind(kind);
+    assertArtifact(kind, name);
+    assertArtifact(kind, newName);
+    if (!(await exists(kind, name))) throw new StoreError(`${kind}/${name} does not exist.`, 404);
+    if (await exists(kind, newName)) throw new StoreError(`${kind}/${newName} already exists.`, 409);
+    const copy = await read(kind, name);
+    if (KINDS[kind].hasDoc) {
+      copy[KINDS[kind].docKey].name = shortName(kind, newName);
+      if (kind === 'jobs') copy.job.enabled = false;
+      if (kind === 'apis') copy.api.enabled = false;
+    }
+    return write(kind, newName, copy);
+  }
+
+  return {
+    get dataDir() {
+      return root();
+    },
+    modulesDir,
+    moduleDir,
+    codePath,
+    docPath,
+    layoutPath,
+    projectFile,
+    listModules,
+    moduleExists,
+    createModule,
+    renameModule,
+    removeModule,
+    legacyLayout,
+    ensureDirs,
+    readProject,
+    reloadProject,
+    currentSettings,
+    writeProject,
+    setAuthEnabledHook,
+    list,
+    tree,
+    exists,
+    read,
+    write,
+    create,
+    remove,
+    rename,
+    duplicate
+  };
+}
+
+// The default instance: this process's own project.
+const own = bindStore(() => config.dataDir);
+
+export const modulesDir = own.modulesDir;
+export const moduleDir = own.moduleDir;
+export const codePath = own.codePath;
+export const docPath = own.docPath;
+export const layoutPath = own.layoutPath;
+export const projectFile = own.projectFile;
+export const listModules = own.listModules;
+export const moduleExists = own.moduleExists;
+export const createModule = own.createModule;
+export const renameModule = own.renameModule;
+export const removeModule = own.removeModule;
+export const legacyLayout = own.legacyLayout;
+export const ensureDirs = own.ensureDirs;
+export const readProject = own.readProject;
+export const reloadProject = own.reloadProject;
+export const currentSettings = own.currentSettings;
+export const writeProject = own.writeProject;
+export const setAuthEnabledHook = own.setAuthEnabledHook;
+export const list = own.list;
+export const tree = own.tree;
+export const exists = own.exists;
+export const read = own.read;
+export const write = own.write;
+export const create = own.create;
+export const remove = own.remove;
+export const rename = own.rename;
+export const duplicate = own.duplicate;
