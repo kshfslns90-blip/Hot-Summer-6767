@@ -11,7 +11,7 @@ const defaults = {
   // GD_DATA_DIR / GD_RUNTIME_DIR; a deployment names them here.
   dataDir: 'data',
   runtimeDir: 'data_runtime',
-  port: 3000,
+  process.env.PORT || 3000,
   // "dev": a runner under the designer, which may hand it the designer API as an extension.
   // "app": a deployed application - no designer API, / opens the app.
   mode: 'dev',
